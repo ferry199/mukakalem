@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Promo</title>
+    <style>
+        /* --- PENGATURAN TAMPILAN (CSS) --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            background: #000;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        video {
+            width: 100%;
+            display: block;
+            border-radius: 12px;
+        }
+
+        /* --- DESAIN TOMBOL PLAY PALSU (LINK AFFILIATE) --- */
+        #playOverlay {
+            display: none; /* Disembunyikan di awal */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Layar meredup */
+            z-index: 20;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Ini adalah link (<a>) yang disamarkan menjadi tombol Play */
+        .fake-play-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 80px;
+            height: 80px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            transition: transform 0.2s;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            animation: pulse 1.5s infinite; /* Efek berdenyut agar menarik untuk diklik */
+        }
+
+        .fake-play-btn:active {
+            transform: scale(0.9); /* Efek mengecil saat ditekan */
+        }
+
+        /* Ikon Segitiga Play */
+        .fake-play-btn svg {
+            width: 40px;
+            height: 40px;
+            margin-left: 5px; /* Digeser sedikit agar segitiganya pas di tengah lingkaran */
+            fill: currentColor;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .footer-text {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #8899a6;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="video-wrapper">
+        <!-- 1. GANTI LINK VIDEO DI SINI -->
+        <video id="videoPlayer" playsinline controls preload="metadata">
+            <source src="https://ferry199.github.io/mukakalem/mukakalem.mp4" type="video/mp4">
+            Browser Anda tidak mendukung pemutaran video.
+        </video>
+
+        <!-- WADAH OVERLAY PLAY PALSU -->
+        <div id="playOverlay">
+            <!-- 
+                2. GANTI LINK AFFILIATE DI SINI 
+                Ini sebenarnya adalah link ke TikTok/Tokopedia, tapi terlihat seperti tombol Play 
+            -->
+            <a href="https://vt.tokopedia.com/t/ZS9hCBrhfdrKD-eBVM9/" target="_blank" class="fake-play-btn" id="linkAffiliate">
+                <!-- Gambar Ikon Play (SVG) -->
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </a>
+        </div>
+    </div>
+
+    <div class="footer-text">
+        <p>Pastikan volume menyala 🔊</p>
+    </div>
+
+    <script>
+        const video = document.getElementById("videoPlayer");
+        const overlay = document.getElementById("playOverlay");
+        const linkBtn = document.getElementById("linkAffiliate");
+        
+        // 3. ATUR WAKTU MUNCULNYA TOMBOL PLAY (Dalam Detik)
+        const WAKTU_MUNCUL = 5;
+        
+        let iklanSudahMuncul = false;
+        let penggunaKeAplikasi = false;
+
+        // FUNGSI 1: Memantau Waktu dan Memunculkan Tombol Play Palsu
+        video.addEventListener("timeupdate", () => {
+            if (video.currentTime >= WAKTU_MUNCUL && !iklanSudahMuncul) {
+                iklanSudahMuncul = true;
+                
+                // Jeda video
+                video.pause(); 
+                
+                // Munculkan layar redup dan tombol play
+                overlay.style.display = "flex"; 
+            }
+        });
+
+        // FUNGSI 2: Deteksi ketika tombol "Play" (Link) ditekan
+        linkBtn.addEventListener("click", () => {
+            // Tandai bahwa penonton masuk perangkap dan pergi ke aplikasi affiliate
+            penggunaKeAplikasi = true;
+        });
+
+        // FUNGSI 3: Lanjutkan video otomatis saat penonton kembali dari aplikasi (back)
+        document.addEventListener("visibilitychange", () => {
+            if (!document.hidden) {
+                // Jika pengguna baru saja menekan tombol play dan kembali
+                if (penggunaKeAplikasi) {
+                    overlay.style.display = "none"; // Sembunyikan tombol play palsu
+                    video.play().catch(e => console.log("Gagal autoplay:", e)); // Lanjut putar video
+                    penggunaKeAplikasi = false; // Reset status
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
+
+
+
